@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'mic_recorder'
-  s.version          = '0.1.0'
+  s.version          = '1.0.0'
   s.summary          = 'Production-grade microphone recording for Flutter: raw PCM streaming, WAV and native encoded file output, audio session handling, interruption recovery and input device switching.'
   s.description      = <<-DESC
 Production-grade microphone recording for Flutter: raw PCM streaming, WAV and native encoded file output (AAC, Apple Lossless, Opus, FLAC, AMR), live dBFS metering, permission management, audio session handling, interruption recovery and input device switching.
