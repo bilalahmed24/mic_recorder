@@ -1,13 +1,19 @@
+# Automated publishing to pub.dev via GitHub Actions OIDC ("trusted
+# publishing"). No long-lived secrets are involved: pub.dev verifies a
+# short-lived OIDC token minted by GitHub for this exact workflow run.
+
 name: publish
 
 on:
   push:
     tags:
-      - 'v*'
-  workflow_dispatch:
+      # Must align with the tag pattern configured on pub.dev: 'v{{version}}'.
+      # The trailing * also admits prerelease tags such as v1.2.3-rc.1 (as
+      # long as the pubspec version is the same 1.2.3-rc.1).
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 # OIDC automated publishing:
-#   id-token: write  — lets `dart pub` / `flutter pub` mint the pub.dev
+#   id-token: write  — lets `dart pub` / `dart pub` mint the pub.dev
 #                      OIDC token during `publish`.
 #   contents: read   — checkout only; nothing else is needed or wanted.
 permissions:
@@ -16,18 +22,13 @@ permissions:
 
 jobs:
   publish:
-    name: Publish to pub.dev
+    name: Publish tag ${{ github.ref_name }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    # Must match the GitHub environment configured on the package's
-    # pub.dev admin tab when automated publishing was enabled (the repo
-    # declares it under Settings → Environments; create `pub.dev` if the
-    # setup step has not happened yet).
     environment: pub.dev
-
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: subosito/flutter-action@v2
         with:
@@ -35,7 +36,7 @@ jobs:
           cache: true
 
       - name: Resolve dependencies
-        run: flutter pub get
+        run: dart pub get
 
       - name: Run tests
         run: flutter test
@@ -60,8 +61,11 @@ jobs:
             exit 1
           fi
 
+      - name: Publish dry run (validates the package before uploading)
+        run: dart pub publish --dry-run
+
       # OIDC: with id-token: write and no credentials configured, the pub
       # tooling authenticates via the GitHub Actions OIDC token bound to
       # the `pub.dev` environment on the package's admin tab.
-      - name: Publish
-        run: flutter pub publish --force
+      - name: Publish to pub.dev
+        run: dart pub publish --force
