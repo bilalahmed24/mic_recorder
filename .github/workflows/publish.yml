@@ -13,8 +13,8 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 # OIDC automated publishing:
-#   id-token: write  — lets `dart pub` / `dart pub` mint the pub.dev
-#                      OIDC token during `publish`.
+#   id-token: write  — lets the job mint the GitHub-signed OIDC token
+#                      that dart-lang/setup-dart registers with pub.
 #   contents: read   — checkout only; nothing else is needed or wanted.
 permissions:
   id-token: write
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    environment: pub.dev
+    environment: pub-dev
     steps:
       - uses: actions/checkout@v7
 
@@ -36,7 +36,7 @@ jobs:
           cache: true
 
       - name: Resolve dependencies
-        run: dart pub get
+        run: flutter pub get
 
       - name: Run tests
         run: flutter test
