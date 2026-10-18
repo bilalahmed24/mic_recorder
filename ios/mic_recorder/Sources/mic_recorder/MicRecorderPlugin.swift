@@ -1,3 +1,4 @@
+import AVFoundation
 import Flutter
 import UIKit
 
@@ -265,7 +266,11 @@ public class MicRecorderPlugin: NSObject, FlutterPlugin {
     }
 
     /// Feeds the armed encoded writer from the audio-stream tee.
-    private func feedEncodedOutput(_ data: Data) {
+    ///
+    /// `fileprivate` because the tee lives in this file's
+    /// `AudioStreamHandler` — a separate class, so `private` would
+    /// hide the member from it.
+    fileprivate func feedEncodedOutput(_ data: Data) {
         encodedWriter?.write(data)
     }
 }

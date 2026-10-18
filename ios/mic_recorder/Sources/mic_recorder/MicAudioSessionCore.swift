@@ -166,25 +166,16 @@ public final class MicAudioSessionCore: NSObject {
         return audioSession.isOtherAudioPlaying
     }
 
-    /// Merges the haptics-and-system-sounds option into the live
-    /// category options and re-applies the current category and mode
-    /// with the merged set.
+    /// Sets the session's allow-haptics-and-system-sounds flag.
+    ///
+    /// The flag is an `AVAudioSession` property in its own right — it
+    /// is NOT a category option — so it is applied with the session's
+    /// dedicated setter (available since iOS 13; the deployment target
+    /// is 15.0, so no availability guard is needed).
     @discardableResult
     public func setAllowHapticsAndSystemSoundsDuringRecording(enabled: Bool) -> Bool {
-        var options = audioSession.categoryOptions
-
-        if enabled {
-            options.insert(.allowHapticsAndSystemSoundsDuringRecording)
-        } else {
-            options.remove(.allowHapticsAndSystemSoundsDuringRecording)
-        }
-
         do {
-            try audioSession.setCategory(
-                audioSession.category,
-                mode: audioSession.mode,
-                options: options
-            )
+            try audioSession.setAllowHapticsAndSystemSoundsDuringRecording(enabled)
 
             return true
         } catch {
@@ -232,7 +223,7 @@ public final class MicAudioSessionCore: NSObject {
     }
 
     /// Encodes one port description with the wire keys.
-    private func encodePort(_ port: AVAudioSession.PortDescription) -> [String: Any] {
+    private func encodePort(_ port: AVAudioSessionPortDescription) -> [String: Any] {
         return [
             "uid": port.uid,
             "portType": port.portType.rawValue,
