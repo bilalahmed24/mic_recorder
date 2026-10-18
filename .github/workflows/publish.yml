@@ -1,21 +1,3 @@
-# Automated (OIDC) publishing of mic_recorder to pub.dev.
-#
-# ONE-TIME BOOTSTRAP — read before relying on this workflow:
-#
-#   1. A NEW package CANNOT be published under a verified publisher, and
-#      OIDC automated publishing CANNOT publish a new package either
-#      (verified via dry-run evidence + dart.dev docs; there is no
-#      `publisher` key in pubspec — pub rejects it).
-#   2. Therefore v0.1.0 MUST be published manually first
-#      (`flutter pub publish` — local gates green, see doc/PUBLISHING.md).
-#   3. Then transfer the package to the verified publisher
-#      `bilalahmed24.com` on the package's pub.dev admin tab
-#      (IRREVERSIBLE), and enable automated publishing there, binding it to
-#      this repository and the `pub.dev` environment below.
-#
-# Only after those steps can this workflow succeed. Full verified checklist:
-# doc/PUBLISHING.md.
-
 name: publish
 
 on:
