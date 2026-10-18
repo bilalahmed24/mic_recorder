@@ -1,0 +1,15 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      The recording permission itself (RECORD_AUDIO) and the Android 13+
+      runtime notification permission (POST_NOTIFICATIONS) belong to the host
+      app — the plugin deliberately does not request permissions.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+
+    <service
+        android:name=".MicForegroundService"
+        android:exported="false"
+        android:foregroundServiceType="microphone" />
+</manifest>

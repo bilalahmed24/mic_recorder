@@ -1,0 +1,24 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    # The example is a standalone package with its own pubspec, lockfiles
+    # and analysis_options.yaml. Analyze it on its own
+    # (`cd example && flutter pub get && flutter analyze`) so root-level
+    # analysis never depends on the example having been pub-get'ed first —
+    # otherwise a fresh clone reports `uri_does_not_exist` /
+    # `creation_with_non_type` from example/test/widget_test.dart.
+    - example/**
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    # The session/route controllers take injected collaborators via factory
+    # style constructors; initializing formals would fight the DI pattern.
+    prefer_initializing_formals: false

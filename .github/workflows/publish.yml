@@ -1,0 +1,85 @@
+# Automated (OIDC) publishing of mic_recorder to pub.dev.
+#
+# ONE-TIME BOOTSTRAP — read before relying on this workflow:
+#
+#   1. A NEW package CANNOT be published under a verified publisher, and
+#      OIDC automated publishing CANNOT publish a new package either
+#      (verified via dry-run evidence + dart.dev docs; there is no
+#      `publisher` key in pubspec — pub rejects it).
+#   2. Therefore v0.1.0 MUST be published manually first
+#      (`flutter pub publish` — local gates green, see doc/PUBLISHING.md).
+#   3. Then transfer the package to the verified publisher
+#      `bilalahmed24.com` on the package's pub.dev admin tab
+#      (IRREVERSIBLE), and enable automated publishing there, binding it to
+#      this repository and the `pub.dev` environment below.
+#
+# Only after those steps can this workflow succeed. Full verified checklist:
+# doc/PUBLISHING.md.
+
+name: publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+# OIDC automated publishing:
+#   id-token: write  — lets `dart pub` / `flutter pub` mint the pub.dev
+#                      OIDC token during `publish`.
+#   contents: read   — checkout only; nothing else is needed or wanted.
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    name: Publish to pub.dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # Must match the GitHub environment configured on the package's
+    # pub.dev admin tab when automated publishing was enabled (the repo
+    # declares it under Settings → Environments; create `pub.dev` if the
+    # setup step has not happened yet).
+    environment: pub.dev
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      # Gate 1: the pushed tag must match the pubspec version.
+      # Gate 2: the CHANGELOG must document exactly that version
+      #         (keep-a-changelog `## [x.y.z] — ...` heading).
+      - name: Verify tag/version and CHANGELOG entry
+        run: |
+          VERSION="$(grep '^version:' pubspec.yaml | awk '{print $2}')"
+          echo "pubspec version: ${VERSION}"
+
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+            if [[ "${GITHUB_REF_NAME}" != "v${VERSION}" ]]; then
+              echo "::error::Tag ${GITHUB_REF_NAME} does not match pubspec version ${VERSION}"
+              exit 1
+            fi
+          fi
+
+          if ! grep -q "^## \[${VERSION}\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [${VERSION}]' entry"
+            exit 1
+          fi
+
+      # OIDC: with id-token: write and no credentials configured, the pub
+      # tooling authenticates via the GitHub Actions OIDC token bound to
+      # the `pub.dev` environment on the package's admin tab.
+      - name: Publish
+        run: flutter pub publish --force

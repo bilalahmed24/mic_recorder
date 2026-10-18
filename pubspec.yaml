@@ -1,0 +1,30 @@
+name: mic_recorder
+description: Production-grade microphone recording with PCM streaming, WAV and native AAC/Opus/FLAC/AMR output, dBFS metering, permissions, audio sessions, interruptions and input switching.
+version: 0.1.0
+homepage: https://github.com/bilalahmed24/mic_recorder
+repository: https://github.com/bilalahmed24/mic_recorder
+issue_tracker: https://github.com/bilalahmed24/mic_recorder/issues
+topics: [audio, microphone, recording, voice, sound]
+
+environment:
+  sdk: ^3.8.0
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.1.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.bilalahmed24.mic_recorder
+        pluginClass: MicRecorderPlugin
+      ios:
+        pluginClass: MicRecorderPlugin

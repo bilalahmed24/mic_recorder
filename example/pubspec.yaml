@@ -1,0 +1,24 @@
+name: mic_recorder_example
+description: Demonstrates the mic_recorder plugin.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The example deliberately depends on nothing but Flutter and the plugin
+  # itself — every feature of the demo is built from the public API.
+  mic_recorder:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
