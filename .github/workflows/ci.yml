@@ -52,6 +52,13 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Resolve example dependencies
+        working-directory: example
+        run: flutter pub get
+
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed .
 
@@ -87,15 +94,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dart-lang/setup-dart@v1
+      # pana needs the Flutter SDK to fully resolve and analyze a plugin
+      # package; a plain Dart SDK silently degrades the report.
+      - uses: subosito/flutter-action@v2
         with:
-          sdk: stable
+          channel: stable
+          cache: true
 
       - name: Install pana
         run: dart pub global activate pana
 
-      - name: Run pana
-        run: pana --no-warning .
+      - name: Run pana (pub.dev scoring engine, dartdoc included)
+        run: dart pub global run pana --flutter-sdk "$FLUTTER_ROOT" .
 
   android:
     name: Android debug APK (example)
@@ -146,6 +156,13 @@ jobs:
       - name: Resolve dependencies
         working-directory: example
         run: flutter pub get
+
+      # The example app ships Android-only to keep the repo lean; generate
+      # the iOS runner on demand — without it `flutter build ios` fails
+      # with "Application not configured for iOS".
+      - name: Generate the iOS runner
+        working-directory: example
+        run: flutter create . --platforms=ios
 
       # Closes the no-Xcode-locally gap: the Swift plugin sources are only
       # compiler-verified here (or on a local macOS machine).
