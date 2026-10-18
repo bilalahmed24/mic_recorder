@@ -64,8 +64,13 @@ jobs:
       - name: Publish dry run (validates the package before uploading)
         run: dart pub publish --dry-run
 
-      # OIDC: with id-token: write and no credentials configured, the pub
-      # tooling authenticates via the GitHub Actions OIDC token bound to
-      # the `pub.dev` environment on the package's admin tab.
+      # Mints the GitHub-signed OIDC token (audience https://pub.dev),
+      # exports it as PUB_TOKEN, and registers it with pub for the
+      # https://pub.dev host — this is what makes publishing secretless.
+      # Runs after flutter-action so subsequent `dart` calls resolve to
+      # this Dart SDK; its `dart pub` finds the Flutter SDK through the
+      # FLUTTER_ROOT exported above.
+      - uses: dart-lang/setup-dart@v1
+
       - name: Publish to pub.dev
         run: dart pub publish --force
